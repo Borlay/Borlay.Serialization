@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.0</Version>
+    <Authors>Paulius Kanoverskis</Authors>
+    <Description>Fast and compact data serialization with ability to add custom object converters</Description>
+    <Copyright>Paulius Kanoverskis</Copyright>
+    <PackageProjectUrl>http://borlay.org</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Borlay/Borlay.Serialization</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>serialization data format protocol</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
