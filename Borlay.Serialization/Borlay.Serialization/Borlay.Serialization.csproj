@@ -11,6 +11,11 @@
     <RepositoryUrl>https://github.com/Borlay/Borlay.Serialization</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>serialization data format protocol</PackageTags>
+    <PackageLicenseUrl>https://github.com/Borlay/Borlay.Serialization/blob/master/LICENSE.md</PackageLicenseUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>F:\github\Borlay.Serialization\Borlay.Serialization\Borlay.Serialization\Borlay.Serialization.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
