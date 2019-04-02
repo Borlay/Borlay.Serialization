@@ -93,21 +93,22 @@ namespace Borlay.Serialization.Converters
 
         private void InitializeConverters()
         {
-            AddValueConverter<bool>(30002);
+            AddConverter<byte>(new ByteValueConverter(), 30002);
+            AddConverter<bool>(new BoolValueConverter(), 30003);
 
-            AddValueConverter<ushort>(30003);
-            AddValueConverter<uint>(30004);
-            AddValueConverter<ulong>(30005);
+            AddValueConverter<ushort>(30004);
+            AddValueConverter<uint>(30005);
+            AddValueConverter<ulong>(30006);
 
-            AddValueConverter<short>(30006);
-            AddValueConverter<int>(30007);
-            AddValueConverter<long>(30008);
+            AddValueConverter<short>(30007);
+            AddValueConverter<int>(30008);
+            AddValueConverter<long>(30009);
 
-            AddValueConverter<float>(30009);
-            AddValueConverter<double>(30010);
-            AddValueConverter<decimal>(30011);
+            AddValueConverter<float>(30010);
+            AddValueConverter<double>(30011);
+            AddValueConverter<decimal>(30012);
 
-            AddValueConverter<char>(30012);
+            AddValueConverter<char>(30013);
 
 
             AddConverter<ByteArray>(new ByteArrayConverter(), 30101);
