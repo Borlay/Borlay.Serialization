@@ -53,5 +53,10 @@ namespace Borlay.Serialization.Converters
             index += count;
             return value;
         }
+
+        public Type GetType(byte[] bytes, int index)
+        {
+            return typeof(string);
+        }
     }
 }

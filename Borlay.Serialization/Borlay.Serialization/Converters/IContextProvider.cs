@@ -8,5 +8,8 @@ namespace Borlay.Serialization.Converters
     {
         ConverterContext GetContext(Type type);
         ConverterContext GetContext(short typeId);
+
+        void AddContext<T>(ConverterContext converterContext, short typeId);
+        void AddContext(ConverterContext converterContext, Type type, short typeId);
     }
 }

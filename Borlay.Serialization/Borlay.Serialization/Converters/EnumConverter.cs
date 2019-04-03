@@ -33,5 +33,10 @@ namespace Borlay.Serialization.Converters
             var value = ByteArrayExtensions.GetValue<ushort>(bytes, size, ref index);
             return value;
         }
+
+        public Type GetType(byte[] bytes, int index)
+        {
+            return typeof(Enum);
+        }
     }
 }

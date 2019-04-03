@@ -15,6 +15,11 @@ namespace Borlay.Serialization.Converters
         {
             return bytes[index++];
         }
+
+        public Type GetType(byte[] bytes, int index)
+        {
+            return typeof(byte);
+        }
     }
 
     public class BoolValueConverter : IConverter
@@ -27,6 +32,11 @@ namespace Borlay.Serialization.Converters
         public object GetObject(byte[] bytes, ref int index)
         {
             return bytes[index++] == 1 ? true : false;
+        }
+
+        public Type GetType(byte[] bytes, int index)
+        {
+            return typeof(bool);
         }
     }
 }

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Borlay.Serialization.Converters
 {
-    public class Serializer : ISerializer, IContextProvider
+    public class Serializer : ISerializer, IConverterProvider, IContextProvider
     {
         private Dictionary<short, ConverterContext> contexts = new Dictionary<short, ConverterContext>();
         private Dictionary<Type, short> contextTypes = new Dictionary<Type, short>();
@@ -18,8 +18,8 @@ namespace Borlay.Serialization.Converters
 
         public static Encoding DefaultStringEncoding { get; set; } = Encoding.UTF8;
 
-        public byte Version => 1;
-        public byte SerializerType => 1;
+        public short Version => 1;
+        //public byte SerializerType => 1;
 
         public Serializer()
         {
@@ -42,39 +42,23 @@ namespace Borlay.Serialization.Converters
             return contextTypes.ContainsKey(type);
         }
 
-        public virtual void Register(Type type)
+        public virtual void Register<T>(Type type)
         {
-            var dataAttribute = type.GetTypeInfo().GetCustomAttribute<DataAttribute>(false);
-            if (dataAttribute.TypeId < 100 && !dataAttribute.IsSystem)
-                throw new ArgumentException($"Data types from 0 to 99 are reserved. Current {dataAttribute.TypeId}");
-
-            var properties = type.GetTypeInfo().GetProperties()
-                .Where(p => p.GetCustomAttribute<IncludeAttribute>(true) != null).Select(property =>
-                new PropertyContext()
-                {
-                    Include = property.GetCustomAttribute<IncludeAttribute>(true),
-                    Array = property.GetCustomAttribute<ArrayAttribute>(true),
-                    PropertyInfo = property,
-                    Converter = GetConverter(property.PropertyType, out var converterTypeId),
-                }).OrderBy(p => p.Include.Order).ToArray();
-
-            if (dataAttribute == null)
-                throw new ArgumentException($"Type '{type.Name}' should contain DataAttribute");
-
-            //if (properties.Length == 0) // todo patikrinti ar tikrai (EmptyResponse)
-            //   throw new ArgumentException($"Type '{type.Name}' should contain properties with IncludeAttribute");
-
-            var converterContext = new ConverterContext()
-            {
-                Type = type,
-                TypeId = dataAttribute.TypeId,
-                Data = dataAttribute,
-                Properties = properties,
-            };
-            AddContext(type, dataAttribute.TypeId, converterContext);
+            Register(typeof(T));
         }
 
-        public virtual void AddContext(Type type, short typeId, ConverterContext converterContext)
+        public virtual void Register(Type type)
+        {
+            var converterContext = this.CreateContext(type, out var typeId);
+            AddContext(converterContext, type, typeId);
+        }
+
+        public virtual void AddContext<T>(ConverterContext converterContext, short typeId)
+        {
+            AddContext(converterContext, typeof(T), typeId);
+        }
+
+        public virtual void AddContext(ConverterContext converterContext, Type type, short typeId)
         {
             contextTypes.Add(type, typeId);
             contexts.Add(typeId, converterContext);
@@ -87,7 +71,12 @@ namespace Borlay.Serialization.Converters
 
         public void AddConverter<T>(IConverter converter, short typeId)
         {
-            converterTypes[typeof(T)] = typeId;
+            AddConverter(converter, typeof(T), typeId);
+        }
+
+        public void AddConverter(IConverter converter, Type type, short typeId)
+        {
+            converterTypes[type] = typeId;
             converters[typeId] = converter;
         }
 
@@ -116,6 +105,7 @@ namespace Borlay.Serialization.Converters
             AddConverter<Enum>(new EnumConverter(), 30103);
 
             AddConverter<object>(new DataConverter(this), 30200);
+            AddConverter<Array>(new ArrayConverter(this), 30201);
         }
 
         // todo 
@@ -134,8 +124,7 @@ namespace Borlay.Serialization.Converters
             var type = obj.GetType();
             var converter = GetConverter(type, out var converterTypeId);
 
-            bytes[index++] = this.Version;
-
+            bytes.AddBytes<short>(Version, 2, ref index);
             bytes.AddBytes<short>(converterTypeId, 2, ref index);
             
             converter.AddBytes(obj, bytes, ref index);
@@ -143,17 +132,25 @@ namespace Borlay.Serialization.Converters
 
         public virtual object GetObject(byte[] bytes, ref int index)
         {
-            if (bytes == null)
-                throw new ArgumentNullException(nameof(bytes));
-
-            if (bytes[index++] != this.Version)
-                throw new VersionMismatchException($"{this.Version}");
-
-            var converterTypeId = bytes.GetValue<short>(2, ref index);
-            var converter = GetConverter(converterTypeId);
+            var converter = GetConverter(bytes, ref index);
             var obj = converter.GetObject(bytes, ref index);
 
             return obj;
+        }
+
+        public virtual IConverter GetConverter(byte[] bytes, ref int index)
+        {
+            if (bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
+
+            var version = bytes.GetValue<short>(2, ref index);
+
+            if (version != this.Version)
+                throw new VersionMismatchException($"Should be {this.Version} but was {version}");
+
+            var converterTypeId = bytes.GetValue<short>(2, ref index);
+            var converter = GetConverter(converterTypeId);
+            return converter;
         }
 
         public virtual IConverter GetConverter<T>(out short typeId)
@@ -164,7 +161,7 @@ namespace Borlay.Serialization.Converters
         public virtual Type ToConverterType(Type type)
         {
             if (type.IsArray)
-                return ToConverterType(type.GetElementType());
+                return typeof(Array); //type.GetElementType();
 
             if (type.GetTypeInfo().IsEnum)
                 return typeof(Enum);
@@ -172,20 +169,27 @@ namespace Borlay.Serialization.Converters
             if (type.GetTypeInfo().IsClass)
                 return typeof(object);
 
-            return type;
+            throw new Exception($"Type '{type.FullName}' doesn't have converter type");
+
+            //return type;
         }
 
         public virtual IConverter GetConverter(Type type, out short typeId)
         {
-            if (converterTypes.TryGetValue(type, out typeId))
-                return GetConverter(typeId);
+            do
+            {
+                if (converterTypes.TryGetValue(type, out typeId))
+                    return GetConverter(typeId);
 
-            var converterType = ToConverterType(type);
+                type = ToConverterType(type);
+            } while (true);
 
-            if(converterTypes.TryGetValue(converterType, out typeId))
-                return GetConverter(typeId);
+            //var converterType = ToConverterType(type);
 
-            throw new KeyNotFoundException($"Converter for type '{type.Name}' not found");
+            //if(converterTypes.TryGetValue(converterType, out typeId))
+            //    return GetConverter(typeId);
+
+            //throw new KeyNotFoundException($"Converter for type '{type.Name}' not found");
         }
 
         public virtual IConverter GetConverter(short typeId)
@@ -250,6 +254,13 @@ namespace Borlay.Serialization.Converters
         public ConverterContext GetContext(short typeId)
         {
             return contexts[typeId];
+        }
+
+        public Type GetType(byte[] bytes, int index)
+        {
+            var converter = GetConverter(bytes, ref index);
+            var type = converter.GetType(bytes, index);
+            return type;
         }
     }   
 

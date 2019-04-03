@@ -12,6 +12,8 @@ namespace Borlay.Serialization.Converters
     {
         public IContextProvider ContextProvider { get; private set; }
 
+        public byte Version { get; } = 1;
+
         public DataConverter(IContextProvider contextProvider)
         {
             if (contextProvider == null)
@@ -31,7 +33,8 @@ namespace Borlay.Serialization.Converters
             var startIndex = index;
             index += 2; // rezervuojam ilgiui;
 
-            bytes.AddBytes<short>(1, 2, ref index); // data converter versija
+            bytes[index++] = this.Version;
+            //bytes.AddBytes<short>(1, 2, ref index); // data converter versija
             bytes.AddBytes<short>(converterData.TypeId, ref index); // data type
 
             for (int p = 0; p < fieldProperties.Length; p++)
@@ -40,7 +43,7 @@ namespace Borlay.Serialization.Converters
 
                 var property = fieldProperties[p];
 
-                if (property.Array != null)
+                if (property.Array != null && false)
                 {
                     var objValue = property.PropertyInfo.GetValue(obj);
                     if (objValue == null)
@@ -153,7 +156,11 @@ namespace Borlay.Serialization.Converters
             ushort count = bytes.GetValue<ushort>(2, ref index);
             var startIndex = index;
 
-            short version = bytes.GetValue<short>(2, ref index); // data converter versija
+            byte version = bytes[index++]; //bytes.GetValue<short>(2, ref index); // data converter versija
+
+            if (version != this.Version)
+                throw new VersionMismatchException($"Should be {this.Version} but was {version}");
+
             short typeId = bytes.GetValue<short>(2, ref index);
 
             var context = ContextProvider.GetContext(typeId);
@@ -172,7 +179,7 @@ namespace Borlay.Serialization.Converters
                 if ((index - startIndex) < count)
                     order = bytes[index];
 
-                if(property.Include.Order != order)
+                if(property.Include.Order != order || ((index - startIndex) == count))
                 {
                     if (property.Include.IsRequired)
                         throw new ArgumentException($"Property '{property.PropertyInfo.Name}' is required but was null");
@@ -181,7 +188,7 @@ namespace Borlay.Serialization.Converters
 
                 index += 1;
 
-                if (property.Array != null)
+                if (property.Array != null && false)
                 {
                     short length = bytes.GetValue<short>(2, ref index);
                     short minLength = property.Array.MinLength;
@@ -273,6 +280,28 @@ namespace Borlay.Serialization.Converters
                 throw new Exception("Something went wrong");
 
             return obj;
+        }
+
+        public Type GetType(byte[] bytes, int index)
+        {
+            if (bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
+            if (bytes.Length == 0)
+                throw new ArgumentException(nameof(bytes.Length));
+
+            ushort count = bytes.GetValue<ushort>(2, ref index);
+            var startIndex = index;
+
+            byte version = bytes[index++]; //bytes.GetValue<short>(2, ref index); // data converter versija
+
+            if (version != this.Version)
+                throw new VersionMismatchException($"Should be {this.Version} but was {version}");
+
+            short typeId = bytes.GetValue<short>(2, ref index);
+
+            var context = ContextProvider.GetContext(typeId);
+
+            return context.Type;
         }
     }
 }

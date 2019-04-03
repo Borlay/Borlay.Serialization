@@ -4,9 +4,7 @@ using System.Text;
 
 namespace Borlay.Serialization.Converters
 {
-    public interface ISerializer : IConverter, IConverterProvider
+    class DateTimeConverter
     {
-        //byte SerializerType { get; }
-
     }
 }

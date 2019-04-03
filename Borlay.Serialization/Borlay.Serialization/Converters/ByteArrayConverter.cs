@@ -33,5 +33,10 @@ namespace Borlay.Serialization.Converters
 
             return new ByteArray(array);
         }
+
+        public Type GetType(byte[] bytes, int index)
+        {
+            return typeof(ByteArray);
+        }
     }
 }

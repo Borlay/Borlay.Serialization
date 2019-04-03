@@ -10,7 +10,7 @@ namespace Borlay.Serialization.Notations
 
         public bool IsRequired { get; private set; }
 
-        public IncludeAttribute(byte order, bool isRequired)
+        public IncludeAttribute(byte order, bool isRequired = false)
         {
             this.Order = order;
             this.IsRequired = isRequired;

@@ -23,5 +23,10 @@ namespace Borlay.Serialization.Converters
         {
             return ByteArrayExtensions.GetValue<T>(bytes, size, ref index);
         }
+
+        public Type GetType(byte[] bytes, int index)
+        {
+            return typeof(T);
+        }
     }
 }
