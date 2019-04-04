@@ -10,14 +10,14 @@ namespace Borlay.Serialization.Converters
         public void AddBytes(object obj, byte[] bytes, ref int index)
         {
             var byteArray = (ByteArray)obj;
-            var addBytes = byteArray.Bytes;
-            var length = addBytes.Length;
+            var array = byteArray.Bytes;
+            var length = array.Length;
 
             if (length > short.MaxValue || length < ushort.MinValue)
                 throw new Exception($"Array length should be between '{ushort.MinValue}' and '{short.MaxValue}' but  is '{length}'");
 
             bytes.AddBytes<ushort>((ushort)length, 2, ref index);
-            Buffer.BlockCopy(addBytes, 0, bytes, index, length);
+            Buffer.BlockCopy(array, 0, bytes, index, length);
             index += length;
         }
 

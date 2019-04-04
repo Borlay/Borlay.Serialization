@@ -23,11 +23,17 @@ namespace Borlay.Serialization.Converters
                 throw new ArgumentNullException(nameof(obj));
 
             var elementType = obj.GetType().GetElementType();
-            var arr = obj as Array;
-
             var converter = ConverterProvider.GetConverter(elementType, out var converterTypeId);
 
             bytes.AddBytes<short>(converterTypeId, 2, ref index);
+
+            if(converter is IArrayConverter arrayConverter)
+            {
+                arrayConverter.AddArrayBytes(obj, bytes, ref index);
+                return;
+            }
+
+            var arr = obj as Array;
             bytes.AddBytes<int>(arr.Length, 4, ref index);
 
             for (int i = 0; i < arr.Length; i++)
@@ -39,6 +45,14 @@ namespace Borlay.Serialization.Converters
         public object GetObject(byte[] bytes, ref int index)
         {
             var converter = GetConverter(bytes, ref index);
+
+            if (converter is IArrayConverter arrayConverter)
+            {
+                var obj = arrayConverter.GetArrayObject(bytes, ref index);
+                return obj;
+            }
+
+
             int length = bytes.GetValue<int>(4, ref index);
 
             var elementType = converter.GetType(bytes, index);

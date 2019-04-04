@@ -31,6 +31,14 @@ namespace Borlay.Serialization.Tests
 
             Assert.AreEqual(testData.Id, back.Id);
             Assert.IsNotNull(back.Items);
+            Assert.AreEqual(testData.Values[0], back.Values[0]);
+            Assert.AreEqual(testData.Values[1], back.Values[1]);
+            Assert.AreEqual(testData.Date.Year, back.Date.Year);
+            Assert.AreEqual(testData.Date.Day, back.Date.Day);
+            Assert.AreEqual(testData.Date.Millisecond, back.Date.Millisecond);
+            Assert.AreEqual(testData.Dates[0].Year, back.Dates[0].Year);
+            Assert.AreEqual(testData.Dates[0].Day, back.Dates[0].Day);
+            Assert.AreEqual(testData.Dates[0].Millisecond, back.Dates[0].Millisecond);
             Assert.AreEqual(testData.Items.Length, back.Items.Length);
             Assert.AreEqual(testData.Items[testItems.Length - 1].Name, back.Items[testItems.Length - 1].Name);
         }
@@ -63,24 +71,56 @@ namespace Borlay.Serialization.Tests
         [TestMethod]
         public void DateTimeTest()
         {
+            var serializer = new Serializer();
+            serializer.LoadFromReference<UnitTest1>();
 
+            var obj = DateTime.Now.AddYears(-3).AddDays(-2).AddMilliseconds(-100);
+
+            var bytes = new byte[64];
+            var index = 0;
+
+            serializer.AddBytes(obj, bytes, ref index);
+
+            index = 0;
+            var back = (DateTime)serializer.GetObject(bytes, ref index);
+
+            Assert.AreEqual(obj.Date.Year, back.Date.Year);
+            Assert.AreEqual(obj.Date.Day, back.Date.Day);
+            Assert.AreEqual(obj.Date.Millisecond, back.Date.Millisecond);
         }
 
         [TestMethod]
         public void TimeSpanTest()
         {
-
+            throw new NotImplementedException();
         }
 
         [TestMethod]
         public void EnumArrayTest()
         {
+            throw new NotImplementedException();
         }
 
         [TestMethod]
         public void IArrayConverterTest()
         {
-            // byte[] IArrayConverter
+            var serializer = new Serializer();
+            serializer.LoadFromReference<UnitTest1>();
+
+            var obj = new byte[] { 5, 7, 20 };
+
+            var bytes = new byte[64];
+            var index = 0;
+
+            serializer.AddBytes(obj, bytes, ref index);
+
+            index = 0;
+            var back = serializer.GetObject(bytes, ref index) as byte[];
+
+            Assert.IsNotNull(back);
+            Assert.AreEqual(obj.Length, back.Length);
+            Assert.IsTrue(obj.ContainsSequence32(back));
+
         }
 
         [TestMethod]
@@ -128,7 +168,8 @@ namespace Borlay.Serialization.Tests
                 Indexes = new int[] { 1, 3 },
                 Value = 0,
                 Values = new byte[] { 4, 7 },
-                //Number = index,
+                Date = DateTime.Now.AddYears(-3).AddDays(-2).AddMilliseconds(-100),
+                Dates = new DateTime[] { DateTime.Now.AddYears(-4).AddDays(-1).AddMilliseconds(-150) },
                 Items = items,
             };
         }
@@ -180,8 +221,10 @@ namespace Borlay.Serialization.Tests
         [Include(10)]
         public bool Is { get; set; }
 
+        [Include(11)]
         public DateTime Date { get; set; }
 
+        [Include(12)]
         public DateTime[] Dates { get; set; }
 
         [Include(13)]

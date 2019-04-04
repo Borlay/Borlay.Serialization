@@ -103,6 +103,7 @@ namespace Borlay.Serialization.Converters
             AddConverter<ByteArray>(new ByteArrayConverter(), 30101);
             AddConverter<string>(new StringConverter(DefaultStringEncoding), 30102);
             AddConverter<Enum>(new EnumConverter(), 30103);
+            AddConverter<DateTime>(new DateTimeConverter(), 30104);
 
             AddConverter<object>(new DataConverter(this), 30200);
             AddConverter<Array>(new ArrayConverter(this), 30201);
