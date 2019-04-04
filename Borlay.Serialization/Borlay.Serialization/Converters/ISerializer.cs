@@ -4,9 +4,12 @@ using System.Text;
 
 namespace Borlay.Serialization.Converters
 {
-    public interface ISerializer : IConverter, IConverterProvider
+    public interface ISerializer : IConverter
     {
-        //byte SerializerType { get; }
+        IContextProvider ContextProvider { get; }
+        IConverterProvider ConverterProvider { get; }
 
+        void Register<T>();
+        void Register(Type type);
     }
 }

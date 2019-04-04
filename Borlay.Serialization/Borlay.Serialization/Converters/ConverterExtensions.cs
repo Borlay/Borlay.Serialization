@@ -25,6 +25,10 @@ namespace Borlay.Serialization.Converters
             return converter.GetObject(bytes, ref index);
         }
 
+        public static void AddValueConverter<T>(this IConverterProvider converterProvider, short typeId)
+        {
+            converterProvider.AddConverter<T>(new ValueConverter<T>(), typeId);
+        }
 
         public static ConverterContext CreateContext(this IConverterProvider converterProvider, Type type, out short typeId)
         {
