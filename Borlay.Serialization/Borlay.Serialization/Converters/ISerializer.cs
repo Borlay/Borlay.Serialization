@@ -6,6 +6,8 @@ namespace Borlay.Serialization.Converters
 {
     public interface ISerializer : IConverter
     {
+        byte Type { get; }
+
         IContextProvider ContextProvider { get; }
         IConverterProvider ConverterProvider { get; }
 

@@ -17,6 +17,8 @@ namespace Borlay.Serialization.Converters
 
         public short Version => 1;
 
+        public byte Type => 1;
+
         public Serializer()
         {
             ContextProvider = new ContextProvider();
