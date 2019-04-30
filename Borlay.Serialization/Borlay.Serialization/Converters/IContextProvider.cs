@@ -9,6 +9,11 @@ namespace Borlay.Serialization.Converters
         ConverterContext GetContext(Type type);
         ConverterContext GetContext(short typeId);
 
+        bool TryGetContext(Type type, out ConverterContext context);
+        bool TryGetContext(short typeId, out ConverterContext context);
+
+        bool TryGetTypeId(Type type, out short typeId);
+
         bool Contains<T>();
         bool Contains(Type type);
 
@@ -58,6 +63,36 @@ namespace Borlay.Serialization.Converters
         {
             contextTypes.Clear();
             contexts.Clear();
+        }
+
+        public bool TryGetContext(Type type, out ConverterContext context)
+        {
+            if(contextTypes.TryGetValue(type, out var typeId))
+            {
+                if (contexts.TryGetValue(typeId, out context))
+                    return true;
+            }
+
+            context = null;
+            return false;
+        }
+
+        public bool TryGetContext(short typeId, out ConverterContext context)
+        {
+            if (contexts.TryGetValue(typeId, out context))
+                return true;
+
+            context = null;
+            return false;
+        }
+
+        public bool TryGetTypeId(Type type, out short typeId)
+        {
+            if (contextTypes.TryGetValue(type, out typeId))
+                return true;
+
+            typeId = 0;
+            return false;
         }
     }
 }

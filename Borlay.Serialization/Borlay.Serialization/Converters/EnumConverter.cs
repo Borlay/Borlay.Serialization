@@ -34,9 +34,14 @@ namespace Borlay.Serialization.Converters
             return value;
         }
 
-        public Type GetType(byte[] bytes, int index)
+        public Type GetType(byte[] bytes, ref int index)
         {
             return typeof(Enum);
+        }
+
+        public void AddType(Type type, byte[] bytes, ref int index)
+        {
+            // do nothing
         }
     }
 }

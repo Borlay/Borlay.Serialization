@@ -15,8 +15,17 @@ namespace Borlay.Serialization.Tests
         [TestMethod]
         public void ConvertTest()
         {
-            var testItems = Enumerable.Range(0, 10).Select(i => CreateTestDataItem($"item-{i}", i)).ToArray();
-            var testData = CreateTestData(Guid.NewGuid().ToString(), 1, testItems);
+            var testItems = Enumerable.Range(0, 10).Select(i => CreateTestDataItem($"item-{i}", i)).ToList();
+            var inhItem = new InheritTestDataItem()
+            {
+                Id = ByteArray.New(32),
+                Name = "Inh",
+                Number = 197452374654985980.596417987646462946M,
+                Value = 5,
+                Type = TestType.InhItem
+            };
+            testItems.Add(inhItem);
+            var testData = CreateTestData(Guid.NewGuid().ToString(), 1, testItems.ToArray());
 
             var serializer = new Serializer();
             serializer.LoadFromReference<UnitTest1>();
@@ -40,7 +49,12 @@ namespace Borlay.Serialization.Tests
             Assert.AreEqual(testData.Dates[0].Day, back.Dates[0].Day);
             Assert.AreEqual(testData.Dates[0].Millisecond, back.Dates[0].Millisecond);
             Assert.AreEqual(testData.Items.Length, back.Items.Length);
-            Assert.AreEqual(testData.Items[testItems.Length - 1].Name, back.Items[testItems.Length - 1].Name);
+            Assert.AreEqual(testData.Items[testItems.Count - 1].Name, back.Items[testItems.Count - 1].Name);
+            Assert.IsInstanceOfType(back.Items[0], typeof(TestDataItem));
+            Assert.IsInstanceOfType(back.Items[testItems.Count - 1], typeof(InheritTestDataItem));
+
+            var backInhItem = (InheritTestDataItem)back.Items[testItems.Count - 1];
+            Assert.AreEqual(inhItem.Number, backInhItem.Number);
         }
 
         [TestMethod]
@@ -259,7 +273,7 @@ namespace Borlay.Serialization.Tests
     public class InheritTestDataItem : TestDataItem
     {
         [Include(3)]
-        public Type Type { get; set; }
+        public TestType Type { get; set; }
 
         [Include(4)]
         public decimal Number { get; set; }

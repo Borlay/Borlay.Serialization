@@ -15,6 +15,8 @@ namespace Borlay.Serialization.Converters
         public IContextProvider ContextProvider { get; protected set; }
         public IConverterProvider ConverterProvider { get; protected set; }
 
+        public bool IsInheritable => true;
+
         public short Version => 1;
 
         public byte Type => 1;
@@ -54,7 +56,7 @@ namespace Borlay.Serialization.Converters
 
             ConverterProvider.AddValueConverter<float>(30010);
             ConverterProvider.AddValueConverter<double>(30011);
-            ConverterProvider.AddValueConverter<decimal>(30012);
+            ConverterProvider.AddConverter<decimal>(new DecimalValueConverter(), 30012);
 
             ConverterProvider.AddValueConverter<char>(30013);
 
@@ -65,7 +67,7 @@ namespace Borlay.Serialization.Converters
             ConverterProvider.AddConverter<DateTime>(new DateTimeConverter(), 30104);
 
             ConverterProvider.AddConverter<object>(new DataConverter(ContextProvider), 30200);
-            ConverterProvider.AddConverter<Array>(new ArrayConverter(ConverterProvider), 30201);
+            ConverterProvider.AddConverter<Array>(new ArrayConverter(ConverterProvider, ContextProvider), 30201);
         }
         
         public virtual void Register<T>()
@@ -166,11 +168,18 @@ namespace Borlay.Serialization.Converters
                    select t;
         }
 
-        public Type GetType(byte[] bytes, int index)
+        public Type GetType(byte[] bytes, ref int index)
         {
-            var converter = GetConverter(bytes, ref index);
-            var type = converter.GetType(bytes, index);
-            return type;
+            throw new NotSupportedException("Serializer GetType is not supported");
+            //var indx = index;
+            //var converter = GetConverter(bytes, ref indx);
+            //var type = converter.GetType(bytes, ref indx);
+            //return type;
+        }
+
+        public void AddType(Type type, byte[] bytes, ref int index)
+        {
+            throw new NotSupportedException("Serializer AddType is not supported");
         }
     }   
 

@@ -40,9 +40,14 @@ namespace Borlay.Serialization.Converters
             return array;
         }
 
-        public Type GetType(byte[] bytes, int index)
+        public Type GetType(byte[] bytes, ref int index)
         {
             return typeof(byte);
+        }
+
+        public void AddType(Type type, byte[] bytes, ref int index)
+        {
+            // do nothing
         }
     }
 
@@ -58,9 +63,14 @@ namespace Borlay.Serialization.Converters
             return bytes[index++] == 1 ? true : false;
         }
 
-        public Type GetType(byte[] bytes, int index)
+        public Type GetType(byte[] bytes, ref int index)
         {
             return typeof(bool);
+        }
+
+        public void AddType(Type type, byte[] bytes, ref int index)
+        {
+            // do nothing
         }
     }
 }

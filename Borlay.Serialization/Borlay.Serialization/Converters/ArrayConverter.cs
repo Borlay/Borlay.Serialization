@@ -8,13 +8,15 @@ namespace Borlay.Serialization.Converters
     public class ArrayConverter : IConverter
     {
         public IConverterProvider ConverterProvider { get; private set; }
+        public IContextProvider ContextProvider { get; }
 
-        public ArrayConverter(IConverterProvider converterProvider)
+        public ArrayConverter(IConverterProvider converterProvider, IContextProvider contextProvider)
         {
             if (converterProvider == null)
                 throw new ArgumentNullException(nameof(converterProvider));
 
             this.ConverterProvider = converterProvider;
+            this.ContextProvider = contextProvider;
         }
 
         public void AddBytes(object obj, byte[] bytes, ref int index)
@@ -27,6 +29,14 @@ namespace Borlay.Serialization.Converters
 
             bytes.AddBytes<short>(converterTypeId, 2, ref index);
 
+            //if (converter.IsInheritable)
+            //{
+            //    if (ContextProvider.TryGetTypeId(elementType, out var typeId))
+            //    {
+            //        bytes.AddBytes<short>(typeId, 2, ref index);
+            //    }
+            //}
+
             if(converter is IArrayConverter arrayConverter)
             {
                 arrayConverter.AddArrayBytes(obj, bytes, ref index);
@@ -35,6 +45,7 @@ namespace Borlay.Serialization.Converters
 
             var arr = obj as Array;
             bytes.AddBytes<int>(arr.Length, 4, ref index);
+            converter.AddType(elementType, bytes, ref index);
 
             for (int i = 0; i < arr.Length; i++)
             {
@@ -52,10 +63,8 @@ namespace Borlay.Serialization.Converters
                 return obj;
             }
 
-
             int length = bytes.GetValue<int>(4, ref index);
-
-            var elementType = converter.GetType(bytes, index);
+            var elementType = converter.GetType(bytes, ref index);
             var elArray = Array.CreateInstance(elementType, length);
 
             for (int i = 0; i < length; i++)
@@ -74,11 +83,17 @@ namespace Borlay.Serialization.Converters
             return converter;
         }
 
-        public Type GetType(byte[] bytes, int index)
+        public Type GetType(byte[] bytes, ref int index)
         {
-            var converter = GetConverter(bytes, ref index);
-            var type = converter.GetType(bytes, index);
-            return type.MakeArrayType();
+            throw new NotSupportedException("ArrayConverter GetType is not supported");
+            //var converter = GetConverter(bytes, ref index);
+            //var type = converter.GetType(bytes, index);
+            //return type.MakeArrayType();
+        }
+
+        public void AddType(Type type, byte[] bytes, ref int index)
+        {
+            throw new NotSupportedException("ArrayConverter AddType is not supported");
         }
     }
 }

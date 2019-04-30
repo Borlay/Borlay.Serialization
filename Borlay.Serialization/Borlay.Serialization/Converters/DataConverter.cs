@@ -282,26 +282,44 @@ namespace Borlay.Serialization.Converters
             return obj;
         }
 
-        public Type GetType(byte[] bytes, int index)
+        public Type GetType(byte[] bytes, ref int index)
         {
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
-            if (bytes.Length == 0)
-                throw new ArgumentException(nameof(bytes.Length));
+            if (bytes.Length < (index + 3))
+                throw new IndexOutOfRangeException(nameof(bytes.Length));
 
-            ushort count = bytes.GetValue<ushort>(2, ref index);
-            var startIndex = index;
-
-            byte version = bytes[index++]; //bytes.GetValue<short>(2, ref index); // data converter versija
-
+            byte version = bytes[index++];
             if (version != this.Version)
                 throw new VersionMismatchException($"Should be {this.Version} but was {version}");
 
-            short typeId = bytes.GetValue<short>(2, ref index);
 
+            short typeId = bytes.GetValue<short>(2, ref index);
             var context = ContextProvider.GetContext(typeId);
 
             return context.Type;
+
+
+            //ushort count = bytes.GetValue<ushort>(2, ref index);
+            //var startIndex = index;
+
+            //byte version = bytes[index++]; //bytes.GetValue<short>(2, ref index); // data converter versija
+
+            //if (version != this.Version)
+            //    throw new VersionMismatchException($"Should be {this.Version} but was {version}");
+
+            //short typeId = bytes.GetValue<short>(2, ref index);
+
+            //var context = ContextProvider.GetContext(typeId);
+
+            //return context.Type;
+        }
+
+        public void AddType(Type type, byte[] bytes, ref int index)
+        {
+            var converterData = ContextProvider.GetContext(type);
+            bytes[index++] = this.Version;
+            bytes.AddBytes<short>(converterData.TypeId, ref index); // data type
         }
     }
 }

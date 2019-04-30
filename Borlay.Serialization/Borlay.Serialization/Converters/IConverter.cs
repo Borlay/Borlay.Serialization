@@ -8,7 +8,9 @@ namespace Borlay.Serialization.Converters
     {
         void AddBytes(object obj, byte[] bytes, ref int index);
         object GetObject(byte[] bytes, ref int index);
-        Type GetType(byte[] bytes, int index);
+        Type GetType(byte[] bytes, ref int index);
+
+        void AddType(Type type, byte[] bytes, ref int index);
     }
 
     public interface IArrayConverter
