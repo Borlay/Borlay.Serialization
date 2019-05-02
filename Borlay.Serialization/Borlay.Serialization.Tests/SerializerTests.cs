@@ -10,7 +10,7 @@ using System.Linq;
 namespace Borlay.Serialization.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class SerializerTests
     {
         [TestMethod]
         public void ConvertTest()
@@ -28,7 +28,7 @@ namespace Borlay.Serialization.Tests
             var testData = CreateTestData(Guid.NewGuid().ToString(), 1, testItems.ToArray());
 
             var serializer = new Serializer();
-            serializer.LoadFromReference<UnitTest1>();
+            serializer.LoadFromReference<SerializerTests>();
 
             var bytes = new byte[1024];
             var index = 0;
@@ -64,7 +64,7 @@ namespace Borlay.Serialization.Tests
             //var testData = CreateTestData(Guid.NewGuid().ToString(), 1, testItems);
 
             var serializer = new Serializer();
-            serializer.LoadFromReference<UnitTest1>();
+            serializer.LoadFromReference<SerializerTests>();
 
             var bytes = new byte[1024];
             var index = 0;
@@ -86,7 +86,7 @@ namespace Borlay.Serialization.Tests
         public void DateTimeTest()
         {
             var serializer = new Serializer();
-            serializer.LoadFromReference<UnitTest1>();
+            serializer.LoadFromReference<SerializerTests>();
 
             var obj = DateTime.Now.AddYears(-3).AddDays(-2).AddMilliseconds(-100);
 
@@ -119,7 +119,7 @@ namespace Borlay.Serialization.Tests
         public void IArrayConverterTest()
         {
             var serializer = new Serializer();
-            serializer.LoadFromReference<UnitTest1>();
+            serializer.LoadFromReference<SerializerTests>();
 
             var obj = new byte[] { 5, 7, 20 };
 
@@ -151,7 +151,7 @@ namespace Borlay.Serialization.Tests
             var testData = CreateTestData(Guid.NewGuid().ToString(), 1, testItems);
 
             var serializer = new Serializer();
-            serializer.LoadFromReference<UnitTest1>();
+            serializer.LoadFromReference<SerializerTests>();
 
             var bytes = new byte[1024];
             var index = 0;
