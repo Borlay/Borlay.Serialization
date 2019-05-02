@@ -78,7 +78,7 @@ namespace Borlay.Serialization.Converters
         public virtual void Register(Type type)
         {
             var converterContext = ConverterProvider.CreateContext(type, out var typeId);
-            ContextProvider.AddContext(converterContext, type, typeId);
+            ContextProvider.AddContext(converterContext, type, (converterContext.SpaceId << 4) + typeId);
         }
 
         // add byte array length checks in ValueConverter or maybe byte.Add extensions, tiksliau get.

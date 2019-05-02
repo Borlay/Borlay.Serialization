@@ -12,6 +12,8 @@ namespace Borlay.Serialization.Converters
 
         public short TypeId { get; set; }
 
+        public int SpaceId { get; set; }
+
         public DataAttribute Data { get; set; }
 
         public PropertyContext[] Properties { get; set; }

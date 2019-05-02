@@ -7,26 +7,24 @@ namespace Borlay.Serialization.Converters
     public interface IContextProvider
     {
         ConverterContext GetContext(Type type);
-        ConverterContext GetContext(short typeId);
+        ConverterContext GetContext(long typeId);
 
         bool TryGetContext(Type type, out ConverterContext context);
-        bool TryGetContext(short typeId, out ConverterContext context);
-
-        bool TryGetTypeId(Type type, out short typeId);
+        bool TryGetContext(long typeId, out ConverterContext context);
 
         bool Contains<T>();
         bool Contains(Type type);
 
-        void AddContext<T>(ConverterContext converterContext, short typeId);
-        void AddContext(ConverterContext converterContext, Type type, short typeId);
+        void AddContext<T>(ConverterContext converterContext, long typeId);
+        void AddContext(ConverterContext converterContext, Type type, long typeId);
 
         void Clear();
     }
 
     public class ContextProvider : IContextProvider
     {
-        protected Dictionary<short, ConverterContext> contexts = new Dictionary<short, ConverterContext>();
-        protected Dictionary<Type, short> contextTypes = new Dictionary<Type, short>();
+        protected Dictionary<long, ConverterContext> contexts = new Dictionary<long, ConverterContext>();
+        protected Dictionary<Type, long> contextTypes = new Dictionary<Type, long>();
 
         public virtual bool Contains<T>()
         {
@@ -38,12 +36,12 @@ namespace Borlay.Serialization.Converters
             return contextTypes.ContainsKey(type);
         }
 
-        public virtual void AddContext<T>(ConverterContext converterContext, short typeId)
+        public virtual void AddContext<T>(ConverterContext converterContext, long typeId)
         {
             AddContext(converterContext, typeof(T), typeId);
         }
 
-        public virtual void AddContext(ConverterContext converterContext, Type type, short typeId)
+        public virtual void AddContext(ConverterContext converterContext, Type type, long typeId)
         {
             contextTypes[type] = typeId;
             contexts[typeId] = converterContext;
@@ -54,7 +52,7 @@ namespace Borlay.Serialization.Converters
             return contexts[contextTypes[type]];
         }
 
-        public virtual ConverterContext GetContext(short typeId)
+        public virtual ConverterContext GetContext(long typeId)
         {
             return contexts[typeId];
         }
@@ -77,21 +75,12 @@ namespace Borlay.Serialization.Converters
             return false;
         }
 
-        public bool TryGetContext(short typeId, out ConverterContext context)
+        public bool TryGetContext(long typeId, out ConverterContext context)
         {
             if (contexts.TryGetValue(typeId, out context))
                 return true;
 
             context = null;
-            return false;
-        }
-
-        public bool TryGetTypeId(Type type, out short typeId)
-        {
-            if (contextTypes.TryGetValue(type, out typeId))
-                return true;
-
-            typeId = 0;
             return false;
         }
     }

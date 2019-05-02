@@ -33,6 +33,11 @@ namespace Borlay.Serialization.Converters
         public static ConverterContext CreateContext(this IConverterProvider converterProvider, Type type, out short typeId)
         {
             var dataAttribute = type.GetTypeInfo().GetCustomAttribute<DataAttribute>(false);
+            var spaceAttr = type.GetTypeInfo().Assembly.GetCustomAttribute<DataSpaceAttribute>();
+            if (spaceAttr == null)
+                throw new ArgumentException($"Assembly should have DataSpace attribute. Example: [Assembly: DataSpace(Date)]");
+            var spaceId = spaceAttr.SpaceId;
+
             if (dataAttribute.TypeId >= 30000 && !dataAttribute.IsSystem)
                 throw new ArgumentException($"Data types from 30000 must have set IsSystem to true. Current: {dataAttribute.TypeId}. Type: {type.FullName}");
 
@@ -56,6 +61,7 @@ namespace Borlay.Serialization.Converters
             {
                 Type = type,
                 TypeId = dataAttribute.TypeId,
+                SpaceId = spaceId,
                 Data = dataAttribute,
                 Properties = properties,
             };

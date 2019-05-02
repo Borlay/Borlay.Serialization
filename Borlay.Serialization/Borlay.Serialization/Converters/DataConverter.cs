@@ -27,15 +27,16 @@ namespace Borlay.Serialization.Converters
             if (obj == null)
                 throw new ArgumentNullException(nameof(obj));
 
-            var converterData = ContextProvider.GetContext(obj.GetType());
-            var fieldProperties = converterData.Properties;
+            var context = ContextProvider.GetContext(obj.GetType());
+            var fieldProperties = context.Properties;
 
             var startIndex = index;
-            index += 2; // rezervuojam ilgiui;
+            index += 4; // rezervuojam ilgiui;
 
             bytes[index++] = this.Version;
             //bytes.AddBytes<short>(1, 2, ref index); // data converter versija
-            bytes.AddBytes<short>(converterData.TypeId, ref index); // data type
+            bytes.AddBytes<int>(context.SpaceId, 4, ref index); // space type
+            bytes.AddBytes<short>(context.TypeId, 2, ref index); // data type
 
             for (int p = 0; p < fieldProperties.Length; p++)
             {
@@ -140,8 +141,8 @@ namespace Borlay.Serialization.Converters
                     throw new Exception("Something went wrong");
             }
 
-            var count = index - (startIndex + 2);
-            bytes.AddBytes((ushort)count, ref startIndex);
+            var count = index - (startIndex + 4);
+            bytes.AddBytes<int>(count, 4, ref startIndex);
         }
 
 
@@ -153,7 +154,7 @@ namespace Borlay.Serialization.Converters
             if (bytes.Length == 0)
                 throw new ArgumentException(nameof(bytes.Length));
 
-            ushort count = bytes.GetValue<ushort>(2, ref index);
+            int count = bytes.GetValue<int>(4, ref index);
             var startIndex = index;
 
             byte version = bytes[index++]; //bytes.GetValue<short>(2, ref index); // data converter versija
@@ -161,9 +162,10 @@ namespace Borlay.Serialization.Converters
             if (version != this.Version)
                 throw new VersionMismatchException($"Should be {this.Version} but was {version}");
 
+            int spaceId = bytes.GetValue<int>(4, ref index);
             short typeId = bytes.GetValue<short>(2, ref index);
 
-            var context = ContextProvider.GetContext(typeId);
+            var context = ContextProvider.GetContext((spaceId << 4) + typeId);
             var fieldProperties = context.Properties;
 
             var obj = Activator.CreateInstance(context.Type);
@@ -294,8 +296,9 @@ namespace Borlay.Serialization.Converters
                 throw new VersionMismatchException($"Should be {this.Version} but was {version}");
 
 
+            int spaceId = bytes.GetValue<int>(4, ref index);
             short typeId = bytes.GetValue<short>(2, ref index);
-            var context = ContextProvider.GetContext(typeId);
+            var context = ContextProvider.GetContext((spaceId << 4) + typeId);
 
             return context.Type;
 
@@ -317,9 +320,11 @@ namespace Borlay.Serialization.Converters
 
         public void AddType(Type type, byte[] bytes, ref int index)
         {
-            var converterData = ContextProvider.GetContext(type);
+            var context = ContextProvider.GetContext(type);
             bytes[index++] = this.Version;
-            bytes.AddBytes<short>(converterData.TypeId, ref index); // data type
+
+            bytes.AddBytes<int>(context.SpaceId, 4, ref index); // space type
+            bytes.AddBytes<short>(context.TypeId, ref index); // data type
         }
     }
 }

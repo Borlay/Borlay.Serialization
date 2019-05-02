@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
     <Authors>Paulius Kanoverskis</Authors>
     <Description>Fast and compact data serialization with ability to add custom object converters</Description>
     <Copyright>Paulius Kanoverskis</Copyright>
