@@ -1,5 +1,4 @@
 using Borlay.Arrays;
-using Borlay.Serialization.Converters;
 using Borlay.Serialization.Notations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -22,7 +21,8 @@ namespace Borlay.Serialization.Tests
                 Name = "Inh",
                 Number = 197452374654985980.596417987646462946M,
                 Value = 5,
-                Type = TestType.InhItem
+                Type = TestType.InhItem,
+                NulValue = 19
             };
             testItems.Add(inhItem);
             var testData = CreateTestData(Guid.NewGuid().ToString(), 1, testItems.ToArray());
@@ -51,6 +51,8 @@ namespace Borlay.Serialization.Tests
             Assert.AreEqual(testData.Items.Length, back.Items.Length);
             Assert.AreEqual(testData.Items[testItems.Count - 1].Name, back.Items[testItems.Count - 1].Name);
             Assert.IsInstanceOfType(back.Items[0], typeof(TestDataItem));
+            Assert.AreEqual(testData.Items[0].NulValue, back.Items[0].NulValue);
+            Assert.AreEqual(19, back.Items[testItems.Count - 1].NulValue);
             Assert.IsInstanceOfType(back.Items[testItems.Count - 1], typeof(InheritTestDataItem));
 
             var backInhItem = (InheritTestDataItem)back.Items[testItems.Count - 1];
@@ -101,6 +103,25 @@ namespace Borlay.Serialization.Tests
             Assert.AreEqual(obj.Date.Year, back.Date.Year);
             Assert.AreEqual(obj.Date.Day, back.Date.Day);
             Assert.AreEqual(obj.Date.Millisecond, back.Date.Millisecond);
+        }
+
+        [TestMethod]
+        public void GuidTest()
+        {
+            var serializer = new Serializer();
+            serializer.LoadFromReference<SerializerTests>();
+
+            var obj = Guid.NewGuid();
+
+            var bytes = new byte[64];
+            var index = 0;
+
+            serializer.AddBytes(obj, bytes, ref index);
+
+            index = 0;
+            var back = (Guid)serializer.GetObject(bytes, ref index);
+
+            Assert.AreEqual(obj, back);
         }
 
         [TestMethod]
@@ -267,15 +288,18 @@ namespace Borlay.Serialization.Tests
 
         [Include(2)]
         public int Value { get; set; }
+
+        [Include(3)]
+        public int? NulValue { get; set; }
     }
 
     [Data(3)]
     public class InheritTestDataItem : TestDataItem
     {
-        [Include(3)]
+        [Include(100)]
         public TestType Type { get; set; }
 
-        [Include(4)]
+        [Include(101)]
         public decimal Number { get; set; }
     }
 }

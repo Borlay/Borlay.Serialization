@@ -1,4 +1,5 @@
 ﻿using Borlay.Arrays;
+using Borlay.Serialization.Converters;
 using Borlay.Serialization.Notations;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Borlay.Serialization.Converters
+namespace Borlay.Serialization
 {
     public class Serializer : ISerializer
     {
@@ -65,6 +66,7 @@ namespace Borlay.Serialization.Converters
             ConverterProvider.AddConverter<string>(new StringConverter(DefaultStringEncoding), 30102);
             ConverterProvider.AddConverter<Enum>(new EnumConverter(), 30103);
             ConverterProvider.AddConverter<DateTime>(new DateTimeConverter(), 30104);
+            ConverterProvider.AddConverter<Guid>(new GuidConverter(), 30105);
 
             ConverterProvider.AddConverter<object>(new DataConverter(ContextProvider), 30200);
             ConverterProvider.AddConverter<Array>(new ArrayConverter(ConverterProvider, ContextProvider), 30201);

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace Borlay.Serialization.Converters
+namespace Borlay.Serialization
 {
     public interface IConverterProvider
     {
@@ -49,6 +49,12 @@ namespace Borlay.Serialization.Converters
 
             if (type.GetTypeInfo().IsClass)
                 return typeof(object);
+
+            Type t = Nullable.GetUnderlyingType(type);
+            if (t != null)
+            {
+                return t;
+            }
 
             throw new Exception($"Type '{type.FullName}' doesn't have converter type");
         }

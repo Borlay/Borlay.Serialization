@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Borlay.Serialization.Converters
+namespace Borlay.Serialization
 {
     public static class ConverterExtensions
     {

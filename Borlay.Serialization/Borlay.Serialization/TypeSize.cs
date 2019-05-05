@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Borlay.Serialization.Converters
+namespace Borlay.Serialization
 {
     public static class TypeSize
     {

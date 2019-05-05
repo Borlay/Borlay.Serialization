@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace Borlay.Serialization.Converters
+namespace Borlay.Serialization
 {
     public class ConverterContext
     {
