@@ -41,23 +41,23 @@ namespace Borlay.Serialization
 
         public virtual Type ToConverterType(Type type)
         {
+            var typeInfo = type.GetTypeInfo();
+
+            Type nullableType = Nullable.GetUnderlyingType(type);
+            if (nullableType != null)
+                return nullableType;
+
             if (type.IsArray)
                 return typeof(Array); //type.GetElementType();
 
-            if (type.GetTypeInfo().IsEnum)
+            if (typeInfo.IsEnum)
                 return typeof(Enum);
 
-            if (type.GetTypeInfo().IsClass)
+            if (typeInfo.IsClass)
                 return typeof(object);
 
-            if (type.GetTypeInfo().IsValueType && !type.GetTypeInfo().IsPrimitive)
+            if (typeInfo.IsValueType && !typeInfo.IsPrimitive)
                 return typeof(object);
-
-            Type t = Nullable.GetUnderlyingType(type);
-            if (t != null)
-            {
-                return t;
-            }
 
             throw new Exception($"Type '{type.FullName}' doesn't have converter type");
         }
