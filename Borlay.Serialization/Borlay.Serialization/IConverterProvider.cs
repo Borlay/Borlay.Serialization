@@ -50,6 +50,9 @@ namespace Borlay.Serialization
             if (type.GetTypeInfo().IsClass)
                 return typeof(object);
 
+            if (type.GetTypeInfo().IsValueType && !type.GetTypeInfo().IsPrimitive)
+                return typeof(object);
+
             Type t = Nullable.GetUnderlyingType(type);
             if (t != null)
             {

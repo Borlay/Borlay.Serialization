@@ -166,7 +166,8 @@ namespace Borlay.Serialization
             return from a in assemblies
                    from t in a.GetTypes()
                    where t.GetTypeInfo().GetCustomAttribute<DataAttribute>(true) != null
-                   && t.GetTypeInfo().IsClass && !t.GetTypeInfo().IsAbstract
+                   //&& t.GetTypeInfo().IsClass && !t.GetTypeInfo().IsAbstract
+                   && !t.GetTypeInfo().IsPrimitive && !t.GetTypeInfo().IsInterface && !t.GetTypeInfo().IsAbstract
                    select t;
         }
 

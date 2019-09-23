@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.9</Version>
+    <Version>1.0.10</Version>
     <Authors>Paulius Kanoverskis</Authors>
     <Description>Fast and compact data serialization with ability to add custom object converters</Description>
     <Copyright>Paulius Kanoverskis</Copyright>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>F:\github\Borlay.Serialization\Borlay.Serialization\Borlay.Serialization\Borlay.Serialization.xml</DocumentationFile>
+    <DocumentationFile>C:\github\Borlay.Serialization\Borlay.Serialization\Borlay.Serialization\Borlay.Serialization.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
